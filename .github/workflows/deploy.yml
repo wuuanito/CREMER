@@ -1,0 +1,26 @@
+name: Deploy to k3s (Self-hosted)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    name: Build, Push to GHCR and Deploy to Kubernetes
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Log in to GHCR
+      run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u wuuanito --password-stdin
+
+    - name: Build Docker image
+      run: docker build -t ghcr.io/wuuanito/CREMER:latest .
+
+    - name: Push image to GHCR
+      run: docker push ghcr.io/wuuanito/CREMER:latest
+
+    - name: Restart Kubernetes deployment
+      run: kubectl rollout restart deployment CREMER
