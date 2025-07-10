@@ -1,0 +1,294 @@
+{
+  "info": {
+    "name": "CREMER - Manufacturing Orders",
+    "description": "Colección completa para gestionar órdenes de fabricación",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Crear Orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    const response = pm.response.json();",
+              "    pm.collectionVariables.set('orderId', response.id);",
+              "    pm.test('Orden creada exitosamente', function () {",
+              "        pm.expect(response.id).to.exist;",
+              "        pm.expect(response.orderCode).to.exist;",
+              "        pm.expect(response.state).to.eql('creado');",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderCode\": \"ORD-{{$timestamp}}\",\n  \"articleCode\": \"ART-001\",\n  \"batch\": \"BATCH-{{$randomInt}}\",\n  \"quantityToProduce\": 1000,\n  \"productDescription\": \"Producto de prueba\",\n  \"numberOfBoxes\": 10,\n  \"bottlesPerBox\": 12,\n  \"boxes\": 10\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Insertar Datos Adicionales",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Datos insertados exitosamente', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.format).to.exist;",
+              "    pm.expect(response.type).to.exist;",
+              "    pm.expect(response.unitsPerBottle).to.exist;",
+              "    pm.expect(response.bottleType).to.exist;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"format\": \"500ml\",\n  \"type\": \"Líquido\",\n  \"unitsPerBottle\": 25,\n  \"bottleType\": \"Vidrio\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}/data",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}", "data"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Iniciar Orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Orden iniciada exitosamente', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.state).to.eql('iniciado');",
+              "    pm.expect(response.startAtOrder).to.exist;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}/start",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}", "start"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Pausar Orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Orden pausada exitosamente', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.state).to.eql('pausado');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}/pause",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}", "pause"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Reanudar Orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Orden reanudada exitosamente', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.state).to.eql('iniciado');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}/resume",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}", "resume"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Finalizar Orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Orden finalizada exitosamente', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.state).to.eql('finalizado');",
+              "    pm.expect(response.finishedAtOrder).to.exist;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}/finish",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}", "finish"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "MQTT - Estado Botes Buenos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/mqtt/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["mqtt", "status"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "MQTT - Estado Botes Expulsados",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/mqtt/expulsados/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["mqtt", "expulsados", "status"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "MQTT - Conectar Botes Buenos",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/mqtt/connect",
+          "host": ["{{baseUrl}}"],
+          "path": ["mqtt", "connect"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "MQTT - Conectar Botes Expulsados",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/mqtt/expulsados/connect",
+          "host": ["{{baseUrl}}"],
+          "path": ["mqtt", "expulsados", "connect"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "MQTT - Desconectar Botes Buenos",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/mqtt/disconnect",
+          "host": ["{{baseUrl}}"],
+          "path": ["mqtt", "disconnect"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "MQTT - Desconectar Botes Expulsados",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/mqtt/expulsados/disconnect",
+          "host": ["{{baseUrl}}"],
+          "path": ["mqtt", "expulsados", "disconnect"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
