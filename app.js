@@ -12,7 +12,7 @@ if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir);
 }
 
-// Inicializar MQTT
+// Inicializar MQT
 const botesPonderalMqtt = require('./src/api/BotesPonderalMqttApi');
 const botesExpulsadosMqtt = require('./src/api/BotesExpulsadosMqttApi');
 
