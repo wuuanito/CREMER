@@ -22,8 +22,42 @@ jobs:
     - name: Push image to GHCR
       run: docker push ghcr.io/wuuanito/cremer:latest
 
-    - name: Deploy to Kubernetes
+    - name: Deploy to Kubernetes (Rolling Update)
       run: |
-        cd /home/administrador/k8s/maquinas/cremer
         kubectl set image deployment/cremer-service cremer-service=ghcr.io/wuuanito/cremer:latest
-        kubectl rollout status deployment/cremer-service
+        kubectl rollout status deployment/cremer-service --timeout=300s
+        echo "✅ Deployment completed successfully!"
+
+## 🔧 Configuración necesaria:
+
+### 1. **Actualizar el workflow** para que funcione correctamente:
+```yaml
+name: Deploy to k3s (Self-hosted)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    name: Build, Push to GHCR and Deploy to Kubernetes
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Log in to GHCR
+      run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u wuuanito --password-stdin
+
+    - name: Build Docker image
+      run: docker build -t ghcr.io/wuuanito/cremer:latest .
+
+    - name: Push image to GHCR
+      run: docker push ghcr.io/wuuanito/cremer:latest
+
+    - name: Deploy to Kubernetes (Rolling Update)
+      run: |
+        kubectl set image deployment/cremer-service cremer-service=ghcr.io/wuuanito/cremer:latest
+        kubectl rollout status deployment/cremer-service --timeout=300s
+        echo "✅ Deployment completed successfully!"
