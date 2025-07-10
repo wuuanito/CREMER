@@ -17,10 +17,13 @@ jobs:
       run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u wuuanito --password-stdin
 
     - name: Build Docker image
-      run: docker build -t ghcr.io/wuuanito/CREMER:latest .
+      run: docker build -t ghcr.io/wuuanito/cremer:latest .
 
     - name: Push image to GHCR
-      run: docker push ghcr.io/wuuanito/CREMER:latest
+      run: docker push ghcr.io/wuuanito/cremer:latest
 
-    - name: Restart Kubernetes deployment
-      run: kubectl rollout restart deployment CREMER
+    - name: Deploy to Kubernetes
+      run: |
+        cd /home/administrador/k8s/maquinas/cremer
+        kubectl set image deployment/cremer-service cremer-service=ghcr.io/wuuanito/cremer:latest
+        kubectl rollout status deployment/cremer-service
