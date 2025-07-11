@@ -241,6 +241,33 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       allowNull: true,
       comment: 'Diferencia vs teórico - calculado al finalizar'
+    },
+
+    // ───── TASAS Y CÁLCULOS ADICIONALES ───────────────────────────────────────
+    expulsionRate: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      comment: 'Tasa de expulsión (%) - calculado al finalizar'
+    },
+    recoveryRateRepercap: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      comment: 'Tasa de recuperación repercap (%) - calculado al finalizar'
+    },
+    recoveryRatePonderal: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      comment: 'Tasa de recuperación ponderal (%) - calculado al finalizar'
+    },
+    bottlesThroughRepercap: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Número de botes que pasan por repercap - calculado al finalizar'
+    },
+    boxesCounted: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Cajas contadas - calculado al finalizar'
     }
   }, {
     tableName: 'manufacturing_orders',
