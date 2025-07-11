@@ -3,11 +3,19 @@ const express = require('express');
 const router = express.Router();
 const { ManufacturingOrder } = require('../config/database');
 
-const ALLOWED_FIELDS = [
+const ALLOWED_FIELDS_CREATED = [
   'format',
   'type',
   'unitsPerBottle',
   'bottleType'
+];
+
+const ALLOWED_FIELDS_PRODUCTION = [
+  'bottlesPonderal',
+  'bottlesRepercap',
+  'expelledBottles',
+  'unitsOk',
+  'unitsNotOk'
 ];
 
 /**
@@ -23,16 +31,21 @@ router.put('/orders/:id/data', async (req, res) => {
       return res.status(404).json({ error: 'Orden no encontrada' });
     }
     
-    // Verificar que la orden esté en estado 'creado'
-    if (order.state !== 'creado') {
+    // Determinar campos permitidos según el estado de la orden
+    let allowedFields;
+    if (order.state === 'creado') {
+      allowedFields = ALLOWED_FIELDS_CREATED;
+    } else if (order.state === 'iniciado') {
+      allowedFields = ALLOWED_FIELDS_PRODUCTION;
+    } else {
       return res.status(400).json({ 
-        error: `No se pueden insertar datos. La orden ya está en estado: ${order.state}` 
+        error: `No se pueden insertar datos. La orden está en estado: ${order.state}` 
       });
     }
     
     // Filtrar solo los campos permitidos
     const updateData = {};
-    for (const key of ALLOWED_FIELDS) {
+    for (const key of allowedFields) {
       if (req.body[key] !== undefined) {
         updateData[key] = req.body[key];
       }
