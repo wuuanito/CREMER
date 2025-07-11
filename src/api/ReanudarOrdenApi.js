@@ -1,7 +1,7 @@
 // api/ReanudarOrdenApi.js
 const express = require('express');
 const router = express.Router();
-const { ManufacturingOrder } = require('../config/database');
+const { ManufacturingOrder, Pause } = require('../config/database');
 
 router.put('/orders/:id/resume', async (req, res) => {
   try {

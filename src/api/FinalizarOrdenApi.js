@@ -20,9 +20,10 @@ router.put('/orders/:id/finish', async (req, res) => {
       });
     }
     
-    // Actualizar estado a 'finalizado'
+    // Actualizar estado a 'finalizado' y establecer fecha de finalización
     await order.update({ 
-      state: 'finalizado'
+      state: 'finalizado',
+      finishedAtOrder: new Date()
     });
     
     res.json({

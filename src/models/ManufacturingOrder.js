@@ -277,33 +277,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
-  // Validación: Solo una orden de fabricación puede estar iniciada
-  ManufacturingOrder.addHook('beforeCreate', async (order) => {
-    if (order.state === 'iniciado') {
-      const activeManufacturingOrder = await ManufacturingOrder.findOne({
-        where: { state: 'iniciado' }
-      });
-      
-      if (activeManufacturingOrder) {
-        throw new Error('Ya existe una orden de fabricación iniciada. Debe finalizar la orden actual antes de iniciar una nueva.');
-      }
-    }
-  });
-
-  ManufacturingOrder.addHook('beforeUpdate', async (order) => {
-    if (order.state === 'iniciado') {
-      const activeManufacturingOrder = await ManufacturingOrder.findOne({
-        where: { 
-          state: 'iniciado',
-          id: { [require('sequelize').Op.ne]: order.id }
-        }
-      });
-      
-      if (activeManufacturingOrder) {
-        throw new Error('Ya existe una orden de fabricación iniciada. Debe finalizar la orden actual antes de iniciar una nueva.');
-      }
-    }
-  });
+  // Hooks
+  const hooks = require('../hooks/manufacturingOrderHooks');
+  ManufacturingOrder.addHook('beforeCreate', hooks.beforeCreate);
+  ManufacturingOrder.addHook('beforeUpdate', hooks.beforeUpdate);
+  ManufacturingOrder.addHook('afterUpdate', hooks.afterUpdate);
 
   ManufacturingOrder.associate = models => {
     ManufacturingOrder.hasMany(models.Pause, {
