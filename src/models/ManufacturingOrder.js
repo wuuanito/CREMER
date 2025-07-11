@@ -271,10 +271,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: 'manufacturing_orders',
-    timestamps: false,
-    hooks: {
-      beforeValidate: require('../hooks/manufacturingOrderHooks').beforeValidate
-    }
+    timestamps: false
   });
 
   // Hooks
